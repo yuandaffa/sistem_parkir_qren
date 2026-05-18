@@ -4,6 +4,7 @@
     Author     : asus
 --%>
 
+<%@page import="classes.JDBC"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -12,6 +13,15 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <%
+            JDBC db = new JDBC();
+            db.connect();
+        %>
+
+    <p>Status Database:</p>
+
+    <h3>
+        <%= db.getMessage()%>
+    </h3>
     </body>
 </html>
