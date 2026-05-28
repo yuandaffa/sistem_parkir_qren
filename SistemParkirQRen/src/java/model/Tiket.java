@@ -6,44 +6,100 @@ package model;
 
 /**
  *
- * @author LENOVO
+ * @author ASUS
  */
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 
 public class Tiket implements Validatable {
+
+
+    public enum StatusTiket {
+        AKTIF, SELESAI, BATAL
+    }
+
+
     private String idTiket;
     private LocalDateTime waktuMasuk;
     private LocalDateTime waktuKeluar;
-    private String statusTiket;
+    private StatusTiket statusTiket;
 
-    public Tiket() {
-        this.idTiket = "";
-        this.waktuMasuk = LocalDateTime.now();
+    private Kendaraan kendaraan;
+
+
+    public Tiket(String idTiket, Kendaraan kendaraan) {
+        this.idTiket = idTiket;
+        this.kendaraan = kendaraan;
+        this.waktuMasuk = LocalDateTime.now();  
+        this.statusTiket = StatusTiket.AKTIF;  
         this.waktuKeluar = null;
-        this.statusTiket = "AKTIF";
     }
+
 
     @Override
-    public void validasiTiket() {
-        if (idTiket == null || idTiket.isEmpty()) {
-            throw new IllegalStateException("ID Tiket tidak boleh kosong.");
-        }
-        if (waktuMasuk == null) {
-            throw new IllegalStateException("Waktu masuk tidak boleh null.");
-        }
-        System.out.println("Tiket " + idTiket + " valid.");
+    public boolean validasiTiket() {
+        return idTiket != null
+                && !idTiket.isBlank()
+                && statusTiket == StatusTiket.AKTIF;
     }
 
-    public String getIdTiket() { return idTiket; }
-    public void setIdTiket(String idTiket) { this.idTiket = idTiket; }
 
-    public LocalDateTime getWaktuMasuk() { return waktuMasuk; }
-    public void setWaktuMasuk(LocalDateTime waktuMasuk) { this.waktuMasuk = waktuMasuk; }
+    public long hitungDurasi() {
+        LocalDateTime akhir = (waktuKeluar != null) ? waktuKeluar : LocalDateTime.now();
+        return ChronoUnit.MINUTES.between(waktuMasuk, akhir);
+    }
 
-    public LocalDateTime getWaktuKeluar() { return waktuKeluar; }
-    public void setWaktuKeluar(LocalDateTime waktuKeluar) { this.waktuKeluar = waktuKeluar; }
+    public void checkout() {
+        this.waktuKeluar = LocalDateTime.now();
+        this.statusTiket = StatusTiket.SELESAI;
+    }
 
-    public String getStatusTiket() { return statusTiket; }
-    public void setStatusTiket(String statusTiket) { this.statusTiket = statusTiket; }
+
+    public String getIdTiket() {
+        return idTiket;
+    }
+
+    public void setIdTiket(String idTiket) {
+        this.idTiket = idTiket;
+    }
+
+    public LocalDateTime getWaktuMasuk() {
+        return waktuMasuk;
+    }
+
+    public void setWaktuMasuk(LocalDateTime waktuMasuk) {
+        this.waktuMasuk = waktuMasuk;
+    }
+
+    public LocalDateTime getWaktuKeluar() {
+        return waktuKeluar;
+    }
+
+    public void setWaktuKeluar(LocalDateTime waktuKeluar) {
+        this.waktuKeluar = waktuKeluar;
+    }
+
+    public StatusTiket getStatusTiket() {
+        return statusTiket;
+    }
+
+    public void setStatusTiket(StatusTiket statusTiket) {
+        this.statusTiket = statusTiket;
+    }
+
+    public Kendaraan getKendaraan() {
+        return kendaraan;
+    }
+
+    public void setKendaraan(Kendaraan kendaraan) {
+        this.kendaraan = kendaraan;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Tiket{id='" + idTiket + "', status=" + statusTiket
+                + ", masuk=" + waktuMasuk + "}";
+    }
 }
-

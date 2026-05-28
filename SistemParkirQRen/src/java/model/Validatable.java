@@ -4,11 +4,7 @@
  */
 package model;
 
-/**
- *
- * @author LENOVO
- */
-public interface Validatable {
-    void validasiTiket();
-}
 
+public interface Validatable {
+    boolean validasiTiket();
+}

@@ -3,66 +3,144 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package classes;
+
 import java.sql.*;
+
 /**
  *
  * @author asus
  */
 public class JDBC {
+
     private Connection con;
     private Statement stmt;
     private String message;
-    
-    public String getMessage(){
+
+    // Static connection
+    private static Connection connection;
+
+    // Konfigurasi database
+    private static final String DB_NAME = "sqr_parkir";
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/" + DB_NAME;
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "";
+
+    public String getMessage() {
         return message;
     }
-    
-    public void setMessage(String msg){
+
+    public void setMessage(String msg) {
         message = msg;
     }
-    
+
+    // Connect biasa
     public void connect() {
-        String dbname = "smart_parking";
-        String username = "root";
-        String password = "";
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + dbname, username, password);
+
+            con = DriverManager.getConnection(
+                    URL,
+                    USERNAME,
+                    PASSWORD
+            );
+
             stmt = con.createStatement();
+
             message = "DB connected";
-        } catch (Exception e){
+
+        } catch (Exception e) {
             message = e.getMessage();
         }
     }
-        private void disconnect(){
-            try{
+
+    // Disconnect
+    private void disconnect() {
+        try {
+
+            if (stmt != null) {
                 stmt.close();
+            }
+
+            if (con != null) {
                 con.close();
-            } catch (Exception e){
-                message = e.getMessage();
             }
+
+        } catch (Exception e) {
+            message = e.getMessage();
         }
-        
-        public void runQuery(String query){
+    }
+
+    // INSERT UPDATE DELETE
+    public void runQuery(String query) {
+
+        try {
+
+            connect();
+
+            int result = stmt.executeUpdate(query);
+
+            message = "Info : " + result + " rows affected";
+
+        } catch (Exception e) {
+
+            message = e.getMessage();
+
+        } finally {
+
+            disconnect();
+
+        }
+    }
+
+    // SELECT
+    public ResultSet getData(String query) {
+
+        ResultSet rs = null;
+
+        try {
+
+            connect();
+
+            rs = stmt.executeQuery(query);
+
+        } catch (Exception e) {
+
+            message = e.getMessage();
+
+        }
+
+        return rs;
+    }
+
+    // Static connection
+    public static Connection getConnection() throws SQLException {
+
+        if (connection == null || connection.isClosed()) {
+
             try {
-                connect();
-                int result = stmt.executeUpdate(query);
-                message = "info: " + result + " rows affected";
-            } catch (Exception e){
-                message = e.getMessage();
-            } finally {
-                disconnect();
+
+                Class.forName("com.mysql.cj.jdbc.Driver");
+
+                connection = DriverManager.getConnection(
+                        URL,
+                        USERNAME,
+                        PASSWORD
+                );
+
+                System.out.println(
+                        "[JDBC] Koneksi database berhasil"
+                );
+
+            } catch (ClassNotFoundException e) {
+
+                throw new SQLException(
+                        "MySQL JDBC Driver tidak ditemukan",
+                        e
+                );
             }
         }
-        
-        public ResultSet getData(String query){
-            ResultSet rs = null;
-            try {
-                connect();
-                rs = stmt.executeQuery(query);
-            } catch (Exception e) {
-                message = e.getMessage();
-            }
-            return rs;
-        }
+
+        return connection;
+    }
 }
